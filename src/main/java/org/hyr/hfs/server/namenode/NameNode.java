@@ -1,8 +1,11 @@
 package org.hyr.hfs.server.namenode;
 
 import org.hyr.hfs.annotation.RpcService;
+import org.hyr.hfs.common.HFSConstant;
 import org.hyr.hfs.ipc.RpcServer;
 import org.hyr.hfs.server.protocol.DataNodeProtocol;
+import org.hyr.hfs.server.protocol.DatanodeCommand;
+import org.hyr.hfs.server.protocol.DatanodeRegInfo;
 import org.hyr.hfs.server.protocol.NameNodeProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,26 +27,6 @@ public class NameNode implements DataNodeProtocol {
 
     private boolean shouldRun = true;
 
-
-    public static void main(String[] args) {
-        int errorCode = 0;
-        try {
-            NameNode datanode = createNameNode();
-            if (datanode != null) {
-                datanode.join();
-                LOG.info("start...");
-            } else {
-                errorCode = 1;
-            }
-        } catch (Throwable e) {
-            LOG.error("Exception in secureMain", e);
-            System.exit(-1);
-        } finally {
-            LOG.warn("Exiting Datanode");
-            System.exit(0);
-        }
-    }
-
     private static NameNode createNameNode() {
         return initNameNode();
     }
@@ -51,7 +34,7 @@ public class NameNode implements DataNodeProtocol {
 
     private static NameNode initNameNode() {
         try {
-            RpcServer ipcServer = new RpcServer(8256, "org.hyr.hfs.server.namenode", 5);
+            RpcServer ipcServer = new RpcServer(HFSConstant.NAME_NODE_IPC_PORT, "org.hyr.hfs.server.namenode", HFSConstant.IPC_HANDLER_COUNT);
             ipcServer.start();
             return new NameNode();
         } catch (Exception e) {
@@ -77,7 +60,40 @@ public class NameNode implements DataNodeProtocol {
         return "namenode:" + versionId+new Date().toLocaleString();
     }
 
+    /**
+     * sent heart beat to namenode
+     * @return
+     * @param datanodeRegInfo
+     */
+    public DatanodeCommand[] sendHeartbeat(DatanodeRegInfo datanodeRegInfo) {
+
+        return new DatanodeCommand[0];
+    }
+
+    public long now() {
+        return System.currentTimeMillis();
+    }
+
     public long getProtocolVersion() {
         return 111;
+    }
+
+    public static void main(String[] args) {
+        int errorCode = 0;
+        try {
+            NameNode datanode = createNameNode();
+            if (datanode != null) {
+                datanode.join();
+                LOG.info("start...");
+            } else {
+                errorCode = 1;
+            }
+        } catch (Throwable e) {
+            LOG.error("Exception in secureMain", e);
+            System.exit(-1);
+        } finally {
+            LOG.warn("Exiting Datanode");
+            System.exit(0);
+        }
     }
 }

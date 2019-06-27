@@ -2,6 +2,7 @@ package org.hyr.hfs.ipc;
 
 import org.hyr.hfs.client.RpcClientProxy;
 import org.hyr.hfs.server.protocol.NameNodeProtocol;
+import org.hyr.hfs.server.protocol.VersionedProtocol;
 
 import java.lang.reflect.Proxy;
 
@@ -37,7 +38,7 @@ public class RPC {
       return null;
     }
 
-    public static void stopProxy(NameNodeProtocol proxy) {
+    public static void stopProxy(VersionedProtocol proxy) {
         if (proxy != null) {
             ((RpcClientProxy) Proxy.getInvocationHandler(proxy)).close();
         }

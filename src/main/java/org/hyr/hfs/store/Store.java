@@ -1,15 +1,12 @@
-
-package org.hyr.hfs.server.protocol;
+package org.hyr.hfs.store;
 
 /*******************************************************************************
- * @date 2019-06-26 11:10
+ *
+ * @date 2019-06-27 13:58 
  * @author: <a href=mailto:@essence.com.cn>黄跃然</a>
- * @Description: RPC协议 和NameNode通信
+ * @Description:
  ******************************************************************************/
-public interface NameNodeProtocol extends VersionedProtocol {
+public class Store extends StorageInfo {
 
-     String getInfo();
-
-     long now();
 
 }

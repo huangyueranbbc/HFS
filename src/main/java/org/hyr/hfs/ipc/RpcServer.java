@@ -26,7 +26,7 @@ public class RpcServer {
     private int port;
     private String clazz;
     private int handlerCount;
-    private boolean running = true;
+    public boolean running = true;
     private ServerSocket server = null;
     private int socketWriteTimeout = 60 * 1000;
 

@@ -1,15 +1,11 @@
-
 package org.hyr.hfs.server.protocol;
 
 /*******************************************************************************
- * @date 2019-06-26 11:10
+ * @date 2019-06-27 13:26
  * @author: <a href=mailto:@essence.com.cn>黄跃然</a>
- * @Description: RPC协议 和NameNode通信
+ * @Description: DataNode交互指令
  ******************************************************************************/
-public interface NameNodeProtocol extends VersionedProtocol {
+public class DatanodeCommand {
 
-     String getInfo();
-
-     long now();
 
 }
