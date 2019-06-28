@@ -1,7 +1,10 @@
 package org.hyr.hfs.ipc;
 
+import org.hyr.hfs.server.datanode.DataNode;
 import org.hyr.hfs.server.protocol.RpcRequest;
 import org.hyr.hfs.server.protocol.RpcResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.reflect.Method;
@@ -14,6 +17,8 @@ import java.util.Map;
  * @Description:
  ******************************************************************************/
 public class RpcService implements Runnable{
+
+	private final static Logger LOG = LoggerFactory.getLogger(RpcService.class);
 	
 	private Socket client;
 	private Map<String,Object> services;
@@ -56,10 +61,10 @@ public class RpcService implements Runnable{
 			}
 			
 			// 3. 查找并执行服务方法
-			System.out.println("services:"+services);
-			System.out.println("request.getClassName():"+request.getClassName());
+			 LOG.info("services:"+services);
+			 LOG.info("request.getClassName():"+request.getClassName());
 			Object service = services.get(request.getClassName());
-			System.out.println("service:"+service);
+			 LOG.info("service:"+service);
 			Class<?> clazz= service.getClass();
 			Method method = clazz.getMethod(request.getMethodName(), request.getParamTypes());
 			Object result = method.invoke(service, request.getParams());

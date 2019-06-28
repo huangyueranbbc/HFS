@@ -1,5 +1,9 @@
 package org.hyr.hfs.ipc;
 
+import org.hyr.hfs.server.datanode.DataNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -22,6 +26,8 @@ import java.util.concurrent.TimeUnit;
  * @Description:
  ******************************************************************************/
 public class RpcServer {
+
+    private final static Logger LOG = LoggerFactory.getLogger(RpcServer.class);
 
     private int port;
     private String clazz;
@@ -65,7 +71,7 @@ public class RpcServer {
             List<Class<?>> classes = new ArrayList<Class<?>>();
             for (String cl : clazzes) {
                 List<Class<?>> classList = getClasses(cl);
-                System.out.println(classList);
+                 LOG.info("get classlist:{}",classList);
                 classes.addAll(classList);
             }
             //循环实例化
@@ -134,7 +140,7 @@ public class RpcServer {
 
         @Override
         public void run() {
-            System.out.println("do rpc run...");
+             LOG.info("do rpc run...");
             try {
                 // 2. 获取所有rpc服务类，即发布服务
                 Map<String, Object> services = getService(clazz);
@@ -143,7 +149,7 @@ public class RpcServer {
                 while (running) {
                     // 4. 获取客户端连接
                     Socket client = server.accept();
-                    System.out.println("get client:" + client);
+                     LOG.info("get client:" + client);
                     // 5. 查找并执行服务
                     RpcService service = new RpcService(client, services);
                     executor.execute(service);

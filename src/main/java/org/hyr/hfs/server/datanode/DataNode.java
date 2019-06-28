@@ -25,7 +25,7 @@ import java.util.UUID;
  ******************************************************************************/
 @RpcService(NameNodeProtocol.class)
 public class DataNode implements Runnable {
-    private static Logger LOG = LoggerFactory.getLogger(DataNode.class);
+    private final static Logger LOG = LoggerFactory.getLogger(DataNode.class);
 
     private final String versionId = UUID.randomUUID().toString();
 
@@ -33,7 +33,8 @@ public class DataNode implements Runnable {
 
     private boolean shouldRun = true; // datanode是否结束信号
 
-    private long heartBeatInterval = 3L * 1000L; // 心跳间隔
+    // private long heartBeatInterval = 3L * 1000L; // 心跳间隔
+    private long heartBeatInterval = 1000L; // 心跳间隔
     private long lastHeartbeat = 0; // 心跳间隔
 
     private RpcServer ipcServer;
@@ -42,7 +43,7 @@ public class DataNode implements Runnable {
 
     public DataNode() {
         try {
-            System.out.println("start new DataNode!");
+            LOG.info("start new DataNode!");
             // TODO 用户Login认证
 
             startDataNode();
@@ -80,7 +81,7 @@ public class DataNode implements Runnable {
     }
 
     private static DataNode createDataNode() {
-        System.out.println("start createDataNode!");
+        LOG.info("start createDataNode!");
         DataNode dataNode = initDataNode();
         runDataNode(dataNode);
         return dataNode;
@@ -89,7 +90,7 @@ public class DataNode implements Runnable {
     private static void runDataNode(DataNode dataNode) {
         // TODO 启动线程
         new Thread(dataNode).start();
-        System.out.println("datanode is start!");
+        LOG.info("datanode is start!");
     }
 
     /**
@@ -133,17 +134,17 @@ public class DataNode implements Runnable {
         // 启动RPC服务
         ipcServer = new RpcServer(HFSConstant.DATA_NODE_IPC_PORT, "org.hyr.hfs.server.datanode", HFSConstant.IPC_HANDLER_COUNT);
         ipcServer.start();
-        System.out.println("ipcServer is start!");
+        LOG.info("ipcServer is start!");
 
 //        // FIXME
 //        while (shouldRun) {
 //            try {
 //                Thread.sleep(100);
 //                DataNodeProtocol datanodeProxy = RPC.getProxy(DataNodeProtocol.class, "127.0.0.1", 8255);
-//                System.out.println(datanodeProxy.getInfo());
+//                 LOG.info(datanodeProxy.getInfo());
 //
 //                NameNodeProtocol nameNodeProxy = RPC.getProxy(NameNodeProtocol.class, "127.0.0.1", 8256);
-//                System.out.println(nameNodeProxy.getInfo());
+//                 LOG.info(nameNodeProxy.getInfo());
 //            } catch (Exception e) {
 //                LOG.error("has error.", e);
 //            }
@@ -156,18 +157,20 @@ public class DataNode implements Runnable {
                 offerservice();
             } catch (Exception e) {
                 LOG.error("datanode run has error.", e);
+                shutdown(); // stop the datanode world
             }
         }
-
-        shutdown(); // stop the datanode world
-
 
     }
 
     /**
      * stop the datanode world
      */
-    private void shutdown() {
+    public synchronized void shutdown() {
+        LOG.info("start shutdown......");
+
+        shouldRun = false;
+
         // stop rpc
         if (ipcServer != null) {
             ipcServer.running = false;
@@ -190,6 +193,7 @@ public class DataNode implements Runnable {
 
                 // 达到心跳间隔 发送心跳
                 if (startTime - lastHeartbeat > heartBeatInterval) {
+                    LOG.info("start send heart beat!");
                     lastHeartbeat = startTime;
                     // TODO 远程调用 上报心跳 datanode和namenode唯一通信方式
                     DatanodeCommand[] datanodeCommands = nameNode.sendHeartbeat(datanodeRegInfo);
@@ -242,6 +246,7 @@ public class DataNode implements Runnable {
         switch (action) {
             case DNA_SHUTDOWN:
                 LOG.info("get DNA_SHUTDOWN action:{}", action);
+                this.shutdown();
                 return false;
             default:
                 LOG.info("Unknown DatanodeCommand action:{}", action);
@@ -276,8 +281,9 @@ public class DataNode implements Runnable {
         try {
             DataNode datanode = createDataNode();
             if (datanode != null) {
-                datanode.join();
                 LOG.info("start...");
+                datanode.join();
+                LOG.info("end...");
             } else {
                 errorCode = 1;
             }

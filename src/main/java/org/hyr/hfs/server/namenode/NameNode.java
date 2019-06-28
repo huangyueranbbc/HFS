@@ -1,6 +1,7 @@
 package org.hyr.hfs.server.namenode;
 
 import org.hyr.hfs.annotation.RpcService;
+import org.hyr.hfs.command.ShutDownCommand;
 import org.hyr.hfs.common.HFSConstant;
 import org.hyr.hfs.exceptions.IncorrectVersionException;
 import org.hyr.hfs.ipc.RpcServer;
@@ -12,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
 
@@ -23,7 +25,7 @@ import java.util.UUID;
 @RpcService(DataNodeProtocol.class)
 public class NameNode implements DataNodeProtocol, NameNodeProtocol {
 
-    private static Logger LOG = LoggerFactory.getLogger(NameNode.class);
+    private final static Logger LOG = LoggerFactory.getLogger(NameNode.class);
 
     private final String versionId = UUID.randomUUID().toString();
 
@@ -77,7 +79,9 @@ public class NameNode implements DataNodeProtocol, NameNodeProtocol {
      */
     public DatanodeCommand[] sendHeartbeat(DatanodeRegInfo datanodeRegInfo) throws IOException {
         verification(datanodeRegInfo);
-        return new DatanodeCommand[0];
+        ArrayList<DatanodeCommand> cmds = new ArrayList<DatanodeCommand>();
+        cmds.add(new ShutDownCommand());    // FIXME
+        return cmds.toArray(new DatanodeCommand[cmds.size()]);
     }
 
     private void verification(DatanodeRegInfo datanodeRegInfo) throws IOException {
