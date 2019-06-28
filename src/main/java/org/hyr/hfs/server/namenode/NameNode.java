@@ -2,14 +2,16 @@ package org.hyr.hfs.server.namenode;
 
 import org.hyr.hfs.annotation.RpcService;
 import org.hyr.hfs.common.HFSConstant;
+import org.hyr.hfs.exceptions.IncorrectVersionException;
 import org.hyr.hfs.ipc.RpcServer;
 import org.hyr.hfs.server.protocol.DataNodeProtocol;
-import org.hyr.hfs.server.protocol.DatanodeCommand;
+import org.hyr.hfs.command.DatanodeCommand;
 import org.hyr.hfs.server.protocol.DatanodeRegInfo;
 import org.hyr.hfs.server.protocol.NameNodeProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.UUID;
 
@@ -18,28 +20,35 @@ import java.util.UUID;
  * @author: <a href=mailto:@essence.com.cn>黄跃然</a>
  * @Description:
  ******************************************************************************/
-@RpcService(NameNodeProtocol.class)
-public class NameNode implements DataNodeProtocol {
+@RpcService(DataNodeProtocol.class)
+public class NameNode implements DataNodeProtocol, NameNodeProtocol {
 
     private static Logger LOG = LoggerFactory.getLogger(NameNode.class);
 
     private final String versionId = UUID.randomUUID().toString();
 
+    private FSNameSystem fsNameSystem;
+
     private boolean shouldRun = true;
 
     private static NameNode createNameNode() {
-        return initNameNode();
+        return new NameNode(true);
     }
 
+    public NameNode() {
+    }
 
-    private static NameNode initNameNode() {
+    public NameNode(boolean shouldRun) {
+        this.shouldRun = shouldRun;
+        initNameNode();
+    }
+
+    private static void initNameNode() {
         try {
             RpcServer ipcServer = new RpcServer(HFSConstant.NAME_NODE_IPC_PORT, "org.hyr.hfs.server.namenode", HFSConstant.IPC_HANDLER_COUNT);
             ipcServer.start();
-            return new NameNode();
         } catch (Exception e) {
             LOG.error("initNameNode is error");
-            return null;
         }
 
     }
@@ -57,17 +66,24 @@ public class NameNode implements DataNodeProtocol {
     }
 
     public String getInfo() {
-        return "namenode:" + versionId+new Date().toLocaleString();
+        return "namenode:" + versionId + new Date().toLocaleString();
     }
 
     /**
      * sent heart beat to namenode
-     * @return
+     *
      * @param datanodeRegInfo
+     * @return
      */
-    public DatanodeCommand[] sendHeartbeat(DatanodeRegInfo datanodeRegInfo) {
-
+    public DatanodeCommand[] sendHeartbeat(DatanodeRegInfo datanodeRegInfo) throws IOException {
+        verification(datanodeRegInfo);
         return new DatanodeCommand[0];
+    }
+
+    private void verification(DatanodeRegInfo datanodeRegInfo) throws IOException {
+        LOG.info("get datanodeRegInfo:" + datanodeRegInfo);
+        if (datanodeRegInfo.getStoreVersion() != HFSConstant.LAYOUT_VERSION)
+            throw new IncorrectVersionException(datanodeRegInfo.getStoreVersion(), "data node");
     }
 
     public long now() {

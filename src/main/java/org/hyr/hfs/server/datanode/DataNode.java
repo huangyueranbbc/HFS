@@ -1,12 +1,13 @@
 package org.hyr.hfs.server.datanode;
 
 import org.hyr.hfs.annotation.RpcService;
+import org.hyr.hfs.command.DatanodeCommand;
 import org.hyr.hfs.common.HFSConstant;
 import org.hyr.hfs.ipc.RPC;
 import org.hyr.hfs.ipc.RpcServer;
 import org.hyr.hfs.server.protocol.DataNodeProtocol;
-import org.hyr.hfs.server.protocol.DatanodeCommand;
 import org.hyr.hfs.server.protocol.DatanodeRegInfo;
+import org.hyr.hfs.server.protocol.NameNodeProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +23,7 @@ import java.util.UUID;
  * @author: <a href=mailto:@essence.com.cn>黄跃然</a>
  * @Description: DataNode
  ******************************************************************************/
-@RpcService(DataNodeProtocol.class)
+@RpcService(NameNodeProtocol.class)
 public class DataNode implements Runnable {
     private static Logger LOG = LoggerFactory.getLogger(DataNode.class);
 
@@ -75,7 +76,6 @@ public class DataNode implements Runnable {
         DataInputStream dis = new DataInputStream(new FileInputStream(HFSConstant.VERSION_PATH));
         datanodeRegInfo.readFields(dis);
         dis.close();
-
 
     }
 
@@ -185,15 +185,69 @@ public class DataNode implements Runnable {
         LOG.info("datanode offerservice is run...");
 
         while (shouldRun) {
-            long startTime = now();
+            try {
+                long startTime = now();
 
-            // 达到心跳间隔 发送心跳
-            if (startTime - lastHeartbeat > heartBeatInterval) {
-                lastHeartbeat = startTime;
-                // TODO 远程调用 上报心跳 datanode和namenode唯一通信方式
-                DatanodeCommand[] datanodeCommands = nameNode.sendHeartbeat(datanodeRegInfo);
+                // 达到心跳间隔 发送心跳
+                if (startTime - lastHeartbeat > heartBeatInterval) {
+                    lastHeartbeat = startTime;
+                    // TODO 远程调用 上报心跳 datanode和namenode唯一通信方式
+                    DatanodeCommand[] datanodeCommands = nameNode.sendHeartbeat(datanodeRegInfo);
+
+                    // 处理namenode下达的指令 失败则等待下一次心跳通信
+                    if (!processCommand(datanodeCommands)) {
+                        continue;
+                    }
+                }
+
+            } catch (Exception e) {
+                LOG.error("offerservice has error.", e);
+            }
+
+        }
+    }
+
+    /**
+     * 处理namenode下达的指令
+     *
+     * @param datanodeCommands
+     * @return
+     */
+    private boolean processCommand(DatanodeCommand[] datanodeCommands) {
+        if (datanodeCommands != null) {
+            for (DatanodeCommand cmd : datanodeCommands) {
+                try {
+                    if (processCommand(cmd) == false) {
+                        return false;
+                    }
+                } catch (Exception e) {
+                    LOG.error("Error processing datanode Command", e);
+                }
             }
         }
+        return true;
+    }
+
+    /**
+     * 具体处理指令逻辑
+     *
+     * @param cmd
+     * @return
+     */
+    private boolean processCommand(DatanodeCommand cmd) {
+        if (cmd == null)
+            return true;
+
+        DataNodeProtocol.DATA_NODE_ACTION action = DataNodeProtocol.DATA_NODE_ACTION.getByValue(cmd.getAction());
+        switch (action) {
+            case DNA_SHUTDOWN:
+                LOG.info("get DNA_SHUTDOWN action:{}", action);
+                return false;
+            default:
+                LOG.info("Unknown DatanodeCommand action:{}", action);
+                break;
+        }
+        return true;
     }
 
     private void join() {

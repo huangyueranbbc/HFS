@@ -2,6 +2,7 @@ package org.hyr.hfs.server.protocol;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.Serializable;
 
 /*******************************************************************************
  *
@@ -9,7 +10,12 @@ import java.io.IOException;
  * @author: <a href=mailto:@essence.com.cn>黄跃然</a>
  * @Description: 存放datanode基本信息
  ******************************************************************************/
-public class DataNodeId  {
+public class DataNodeId implements Serializable {
+
+    /**
+     * 序列化id
+     */
+    private static final long serialVersionUID = -1;
 
     public String nodeName;
     public String hostname;    // data transfer hostname
@@ -17,6 +23,10 @@ public class DataNodeId  {
     public String ipcHostname; // ipc hostname
     public int ipcPort;       // ipc server port
 
+
+    public DataNodeId() {
+        this("");
+    }
 
     public DataNodeId(String nodeName) {
         this.nodeName = nodeName;

@@ -12,7 +12,16 @@ import java.io.*;
  ******************************************************************************/
 public class DatanodeRegInfo extends DataNodeId implements Serializable {
 
+    /**
+     * 序列化id
+     */
+    private static final long serialVersionUID = -1;
+
     public StorageInfo storageInfo;
+
+    public DatanodeRegInfo() {
+        super("");
+    }
 
     public DatanodeRegInfo(String nodeName) {
         super(nodeName);
@@ -21,18 +30,26 @@ public class DatanodeRegInfo extends DataNodeId implements Serializable {
 
     public DatanodeRegInfo(String nodeName, String hostname, int port, String ipcHostname, int ipcPort) {
         super(nodeName, hostname, port, ipcHostname, ipcPort);
-        this.storageInfo = new StorageInfo();
     }
 
-    public int getStoreVersion(){
+    public int getStoreVersion() {
         return storageInfo.getStoreVersion();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void readFields(DataInputStream dis) throws IOException {
         super.readFields(dis);
-        this.storageInfo.storeVersion=dis.readInt();
-        this.storageInfo.namespaceID=dis.readInt();
-        this.storageInfo.createTime=dis.readLong();
+        this.storageInfo.storeVersion = dis.readInt();
+        this.storageInfo.namespaceID = dis.readInt();
+        this.storageInfo.createTime = dis.readLong();
+    }
+
+    @Override
+    public String toString() {
+        return "DatanodeRegInfo{" +
+                "storageInfo=" + storageInfo +
+                '}';
     }
 }

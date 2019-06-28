@@ -56,7 +56,10 @@ public class RpcService implements Runnable{
 			}
 			
 			// 3. 查找并执行服务方法
+			System.out.println("services:"+services);
+			System.out.println("request.getClassName():"+request.getClassName());
 			Object service = services.get(request.getClassName());
+			System.out.println("service:"+service);
 			Class<?> clazz= service.getClass();
 			Method method = clazz.getMethod(request.getMethodName(), request.getParamTypes());
 			Object result = method.invoke(service, request.getParams());

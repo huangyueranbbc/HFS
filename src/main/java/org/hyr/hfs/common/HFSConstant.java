@@ -19,11 +19,15 @@ public class HFSConstant {
     public final static Integer NAME_NODE_IPC_PORT = 8256;
 
 
-    public final static Integer DEFAULT_STORE_VERSION = -101;
+    public final static Integer DEFAULT_STORE_VERSION = -66;
     public final static Integer DEFAULT_NAMESPACEID = 888888;
     public final static Long DEFAULT_STORE_CREATE_TIME = new Date().getTime();
 
     public final static Integer IPC_HANDLER_COUNT = 3;
 
+    public static final int LAYOUT_VERSION = -66;
+
+    // TODO 安全模式
+    public enum SAFEMODE_ACTION{ SAFEMODE_LEAVE, SAFEMODE_ENTER, SAFEMODE_GET; }
 
 }
