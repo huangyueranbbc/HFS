@@ -12,9 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.util.Date;
 import java.util.UUID;
 
@@ -66,14 +64,6 @@ public class DataNode implements Runnable {
         datanodeRegInfo.setIpcPort(HFSConstant.DATA_NODE_IPC_PORT);
 
         // 读取version信息
-        // FIXME 该操作放入format进行
-        FileOutputStream fos = new FileOutputStream(HFSConstant.VERSION_PATH);
-        DataOutputStream dos = new DataOutputStream(fos);
-        dos.writeInt(HFSConstant.DEFAULT_STORE_VERSION); // storeVersion
-        dos.writeInt(HFSConstant.DEFAULT_NAMESPACEID); // namespaceID
-        dos.writeLong(HFSConstant.DEFAULT_STORE_CREATE_TIME); // createTime
-        dos.close();
-
         DataInputStream dis = new DataInputStream(new FileInputStream(HFSConstant.VERSION_PATH));
         datanodeRegInfo.readFields(dis);
         dis.close();
@@ -136,19 +126,6 @@ public class DataNode implements Runnable {
         ipcServer.start();
         LOG.info("ipcServer is start!");
 
-//        // FIXME
-//        while (shouldRun) {
-//            try {
-//                Thread.sleep(100);
-//                DataNodeProtocol datanodeProxy = RPC.getProxy(DataNodeProtocol.class, "127.0.0.1", 8255);
-//                 LOG.info(datanodeProxy.getInfo());
-//
-//                NameNodeProtocol nameNodeProxy = RPC.getProxy(NameNodeProtocol.class, "127.0.0.1", 8256);
-//                 LOG.info(nameNodeProxy.getInfo());
-//            } catch (Exception e) {
-//                LOG.error("has error.", e);
-//            }
-//        }
 
         // TODO 核心业务 上报心跳、处理rpc请求、处理数据......
         while (shouldRun) {

@@ -2,6 +2,7 @@
 package org.hyr.hfs.server.protocol;
 
 import org.hyr.hfs.command.DatanodeCommand;
+import org.hyr.hfs.server.namenode.FSNameSystem;
 
 import java.io.IOException;
 

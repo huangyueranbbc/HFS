@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.Map;
 
 /*******************************************************************************
@@ -67,6 +68,7 @@ public class RpcService implements Runnable{
 			 LOG.info("service:"+service);
 			Class<?> clazz= service.getClass();
 			Method method = clazz.getMethod(request.getMethodName(), request.getParamTypes());
+			LOG.info("method:"+method);
 			Object result = method.invoke(service, request.getParams());
 			// 4. 得到结果并返回
 			response.setResult(result);
