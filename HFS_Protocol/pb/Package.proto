@@ -1,0 +1,15 @@
+syntax = "proto3";
+option java_multiple_files = true;
+option java_package = "org.hyr.hfs.protobuf";
+package org.hyr.hfs.protobuf;
+
+message Package {
+    repeated Record   records = 	1;	//数据
+    uint64   timestamp =   2;	//数据时间戳
+    uint32   total =     	3;	//该事件节点总包数
+    uint32   index =     	4;	//该数据包的索引index
+}
+
+message Record{
+    bytes data =   1; //内容
+}
