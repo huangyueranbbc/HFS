@@ -124,6 +124,8 @@ public class DataNode implements Runnable {
         ipcServer.start();
         LOG.info("ipcServer is start!");
 
+        // 启动处理数据线程
+        dataProcessor.start();
 
         // TODO 核心业务 上报心跳、处理rpc请求、处理数据......
         while (shouldRun) {

@@ -21,6 +21,7 @@ public class DataProcessorServer implements Runnable {
     ServerSocket serverSocket;
 
     public DataProcessorServer(ServerSocket serverSocket, DataNode dataNode) {
+        LOG.info("start create DataProcessorServer.");
         this.serverSocket = serverSocket;
         this.dataNode = dataNode;
     }
@@ -28,6 +29,7 @@ public class DataProcessorServer implements Runnable {
     @Override
     public void run() {
         while (dataNode.shouldRun){
+            LOG.info("DataProcessorServer is running......");
             try {
                 Socket socket = serverSocket.accept();
                 socket.setTcpNoDelay(true); // 立即发送数据

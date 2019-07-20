@@ -22,6 +22,7 @@ public class DataProcesser implements Runnable {
     final String localAddress;  // local address of this daemon
 
     public DataProcesser(Socket socket, DataNode dataNode, DataProcessorServer dataProcessorServer) {
+        LOG.info("start create DataProcesser.");
         this.socket = socket;
         this.dataNode = dataNode;
         this.dataProcessorServer = dataProcessorServer;
