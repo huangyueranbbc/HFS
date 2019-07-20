@@ -23,6 +23,13 @@ public interface DataNodeProtocol extends VersionedProtocol {
      */
     DatanodeCommand[] sendHeartbeat(DatanodeRegInfo datanodeRegInfo) throws IOException;
 
+    /**
+     * 上报block
+     * @return
+     * @throws IOException
+     */
+    DatanodeCommand[] blockReport() throws IOException;
+
     long now();
 
     public enum DATA_NODE_ACTION {

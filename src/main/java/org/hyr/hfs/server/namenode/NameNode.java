@@ -150,6 +150,11 @@ public class NameNode implements DataNodeProtocol, NameNodeProtocol {
         return this.fsNameSystem.handleHeartbeat();
     }
 
+    @Override
+    public DatanodeCommand[] blockReport() throws IOException {
+        return new DatanodeCommand[0];
+    }
+
     private void verification(DatanodeRegInfo datanodeRegInfo) throws IOException {
         LOG.info("get datanodeRegInfo:" + datanodeRegInfo);
         if (datanodeRegInfo.getStoreVersion() != HFSConstant.LAYOUT_VERSION)

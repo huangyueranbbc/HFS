@@ -8,11 +8,15 @@ import org.hyr.hfs.ipc.RpcServer;
 import org.hyr.hfs.server.protocol.DataNodeProtocol;
 import org.hyr.hfs.server.protocol.DatanodeRegInfo;
 import org.hyr.hfs.server.protocol.NameNodeProtocol;
+import org.hyr.hfs.thread.Daemon;
+import org.hyr.hfs.utils.NetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.DataInputStream;
 import java.io.FileInputStream;
+import java.net.ServerSocket;
+import java.nio.channels.ServerSocketChannel;
 import java.util.Date;
 import java.util.UUID;
 
@@ -27,17 +31,27 @@ public class DataNode implements Runnable {
 
     private final String versionId = UUID.randomUUID().toString();
 
+    ThreadGroup threadGroup = null;
+
     private DataNodeProtocol nameNode;
 
-    private boolean shouldRun = true; // datanode是否结束信号
+    volatile boolean shouldRun = true; // datanode是否结束信号 增加内存屏障，强制统一更新
 
     // private long heartBeatInterval = 3L * 1000L; // 心跳间隔
     private long heartBeatInterval = 1000L; // 心跳间隔
-    private long lastHeartbeat = 0; // 心跳间隔
+    private long lastHeartbeat = 0; // 上次上报心跳时间
+
+    private long blockReportInterval = 1000L; // 上报block间隔
+    private long lastBlockReport = 0; // 上次上报block时间
 
     private RpcServer ipcServer;
 
     DatanodeRegInfo datanodeRegInfo;
+
+    // 数据处理
+    private int socketWriteTimeout = 0;
+
+    Daemon dataProcessor = null;
 
     public DataNode() {
         try {
@@ -63,12 +77,23 @@ public class DataNode implements Runnable {
         datanodeRegInfo.setIpcHostname(HFSConstant.DATA_NODE_MACHINE_NAME);
         datanodeRegInfo.setIpcPort(HFSConstant.DATA_NODE_IPC_PORT);
 
+        this.threadGroup = new ThreadGroup("dataXceiverServer");
+
+        ServerSocket ss;
+        ss = (socketWriteTimeout > 0) ?
+                ServerSocketChannel.open().socket() : new ServerSocket();
+        NetUtils.bindNet(ss, HFSConstant.DATA_NODE_DATA_STEAM_NAME, HFSConstant.DATA_NODE_DATA_STEAM_PORT);
+        ss.setReceiveBufferSize(HFSConstant.DEFAULT_DATA_SOCKET_SIZE);
+
+        dataProcessor = new Daemon(threadGroup, new DataProcessorServer(ss, this));
+
         // 读取version信息
         DataInputStream dis = new DataInputStream(new FileInputStream(HFSConstant.VERSION_PATH));
         datanodeRegInfo.readFields(dis);
         dis.close();
 
     }
+
 
     private static DataNode createDataNode() {
         LOG.info("start createDataNode!");
@@ -180,6 +205,16 @@ public class DataNode implements Runnable {
                         continue;
                     }
                 }
+
+                // 上报block
+                if (startTime - lastBlockReport > blockReportInterval) {
+                    DatanodeCommand[] datanodeCommands = nameNode.blockReport();
+
+
+                    lastBlockReport += (now() - lastBlockReport) /
+                            blockReportInterval * blockReportInterval;
+                }
+
 
             } catch (Exception e) {
                 LOG.error("offerservice has error.", e);

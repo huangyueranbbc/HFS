@@ -18,6 +18,10 @@ public class HFSConstant {
     public final static String NAME_NODE_MACHINE_NAME = "127.0.0.1";
     public final static Integer NAME_NODE_IPC_PORT = 8256;
 
+    public final static String DATA_NODE_DATA_STEAM_NAME = "127.0.0.1";
+    public final static Integer DATA_NODE_DATA_STEAM_PORT = 8899;
+    public static final int DEFAULT_DATA_SOCKET_SIZE = 128 * 1024;
+
 
     public final static Integer DEFAULT_STORE_VERSION = -66;
     public final static Integer DEFAULT_NAMESPACEID = 888888;
