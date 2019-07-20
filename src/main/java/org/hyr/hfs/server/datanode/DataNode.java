@@ -53,23 +53,24 @@ public class DataNode implements Runnable {
 
     Daemon dataProcessor = null;
 
-    public DataNode() {
+    public DataNode(boolean shouldRun) throws Exception {
         try {
             LOG.info("start new DataNode!");
             // TODO 用户Login认证
-
+            this.shouldRun = shouldRun;
             startDataNode();
         } catch (Exception e) {
             shutdown();
             e.printStackTrace();
         }
+    }
 
+    public DataNode() {
     }
 
     private void startDataNode() throws Exception {
         // rpc获取namenode代理对象进行通信
         nameNode = RPC.getProxy(DataNodeProtocol.class, HFSConstant.NAME_NODE_MACHINE_NAME, HFSConstant.NAME_NODE_IPC_PORT);
-
         // 初始化datanode注册信息
         datanodeRegInfo = new DatanodeRegInfo(HFSConstant.DATA_NODE_MACHINE_NAME);
         datanodeRegInfo.setHostname(HFSConstant.DATA_NODE_MACHINE_NAME);
@@ -95,43 +96,15 @@ public class DataNode implements Runnable {
     }
 
 
-    private static DataNode createDataNode() {
+    private static DataNode createDataNode() throws Exception {
         LOG.info("start createDataNode!");
-        DataNode dataNode = initDataNode();
-        runDataNode(dataNode);
-        return dataNode;
+        return new DataNode(true);
     }
 
     private static void runDataNode(DataNode dataNode) {
         // TODO 启动线程
         new Thread(dataNode).start();
         LOG.info("datanode is start!");
-    }
-
-    /**
-     * 初始化datanode
-     *
-     * @return
-     */
-    private synchronized static DataNode initDataNode() {
-        DataNode dataNode = instantiateDataNode(); // 初始化
-        return dataNode;
-    }
-
-    /**
-     * 初始化相关信息
-     *
-     * @return
-     */
-    private static DataNode instantiateDataNode() {
-        try {
-            // TODO 文件系统 权限认证 确保有读写权限
-
-
-            return new DataNode();
-        } catch (Exception e) {
-            return null;
-        }
     }
 
     public String getInfo() {
@@ -292,6 +265,7 @@ public class DataNode implements Runnable {
         int errorCode = 0;
         try {
             DataNode datanode = createDataNode();
+            runDataNode(datanode);
             if (datanode != null) {
                 LOG.info("start...");
                 datanode.join();

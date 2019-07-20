@@ -14,8 +14,9 @@ import java.net.ServerSocket;
 public class NetUtils {
 
     public static void bindNet(ServerSocket ss, String host, int port) throws IOException {
-        InetSocketAddress inetSocketAddress = InetSocketAddress.createUnresolved(host, port);
-        ss.bind(inetSocketAddress, 0);
+        // InetSocketAddress inetSocketAddress = InetSocketAddress.createUnresolved(host, port);
+        InetSocketAddress inetSocketAddress2= new InetSocketAddress(port);
+        ss.bind(inetSocketAddress2, 0);
     }
 
 }
