@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 /*******************************************************************************
  * @date 2019-06-27 13:26
- * @author: <a href=mailto:@essence.com.cn>黄跃然</a>
+ * @author: <a href=mailto:@huang>黄跃然</a>
  * @Description: DataNode交互指令
  ******************************************************************************/
 public class DatanodeCommand implements Serializable {

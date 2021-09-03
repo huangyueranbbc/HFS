@@ -7,7 +7,7 @@ import java.io.Serializable;
 /*******************************************************************************
  *
  * @date 2019-06-27 13:38 
- * @author: <a href=mailto:@essence.com.cn>黄跃然</a>
+ * @author: <a href=mailto:@huang>黄跃然</a>
  * @Description: 存放datanode基本信息
  ******************************************************************************/
 public class DataNodeId implements Serializable {

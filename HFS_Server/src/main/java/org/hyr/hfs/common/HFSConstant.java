@@ -5,7 +5,7 @@ import java.util.Date;
 /*******************************************************************************
  *
  * @date 2019-06-27 14:51 
- * @author: <a href=mailto:@essence.com.cn>黄跃然</a>
+ * @author: <a href=mailto:@huang>黄跃然</a>
  * @Description: 常量存储 主要是配置相关 TODO 从配置文件中读取
  ******************************************************************************/
 public class HFSConstant {

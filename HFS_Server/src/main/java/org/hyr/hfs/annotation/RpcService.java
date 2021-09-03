@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 /*******************************************************************************
  * @date 2019-06-26 13:42
- * @author: <a href=mailto:@essence.com.cn>黄跃然</a>
+ * @author: <a href=mailto:@huang>黄跃然</a>
  * @Description:
  ******************************************************************************/
 @Target(ElementType.TYPE)

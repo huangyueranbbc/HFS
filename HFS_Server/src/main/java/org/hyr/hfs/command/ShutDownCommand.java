@@ -4,7 +4,7 @@ import org.hyr.hfs.server.protocol.DataNodeProtocol;
 
 /*******************************************************************************
  * @date 2019-06-28 11:00
- * @author: <a href=mailto:@essence.com.cn>黄跃然</a>
+ * @author: <a href=mailto:@huang>黄跃然</a>
  * @Description:
  ******************************************************************************/
 public class ShutDownCommand extends DatanodeCommand{

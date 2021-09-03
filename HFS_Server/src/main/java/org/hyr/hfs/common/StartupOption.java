@@ -2,7 +2,7 @@ package org.hyr.hfs.common;
 
 /*******************************************************************************
  * @date 2019-06-28 14:24
- * @author: <a href=mailto:@essence.com.cn>黄跃然</a>
+ * @author: <a href=mailto:@huang>黄跃然</a>
  * @Description: namenode启动指令
  ******************************************************************************/
 public enum StartupOption {

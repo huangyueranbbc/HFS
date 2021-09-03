@@ -20,7 +20,7 @@ import java.util.UUID;
 
 /*******************************************************************************
  * @date 2019-06-26 13:47
- * @author: <a href=mailto:@essence.com.cn>黄跃然</a>
+ * @author: <a href=mailto:@huang>黄跃然</a>
  * @Description:
  ******************************************************************************/
 @RpcService(DataNodeProtocol.class)

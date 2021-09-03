@@ -12,7 +12,7 @@ import java.util.Map;
 
 /*******************************************************************************
  * @date 2019-06-26 11:10
- * @author: <a href=mailto:@essence.com.cn>黄跃然</a>
+ * @author: <a href=mailto:@huang>黄跃然</a>
  * @Description:
  ******************************************************************************/
 public class RpcService implements Runnable{
